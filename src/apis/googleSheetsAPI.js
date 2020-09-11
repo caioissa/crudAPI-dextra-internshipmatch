@@ -1,9 +1,6 @@
 const fs = require('fs');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
-const TOKEN_PATH = 'json/token.json';
-const CRED_PATH = 'json/credentials.json';
-
 async function getSheet() {
     const doc = new GoogleSpreadsheet('1ZCh7lPkzcnT1vTewM3pnDXrZwock_Avm4atEgxCxnrY');
     await doc.useServiceAccountAuth(require('../../json/credentials.json'));
