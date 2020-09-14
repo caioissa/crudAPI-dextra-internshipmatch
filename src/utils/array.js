@@ -6,12 +6,4 @@ const toArray = str => {
     }
 }
 
-const toString = array => {
-    try {
-        return array.join(';');
-    } catch (e) {
-        return null;
-    }
-}
-
-module.exports = { toArray, toString };
+module.exports = { toArray };

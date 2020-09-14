@@ -1,4 +1,4 @@
-const { toArray, toString } = require('../../utils/array');
+const { toArray } = require('../../utils/array');
 const { getUserFromEmail } = require('../../utils/username');
 
 const parser = (row, i) => ({
