@@ -1,4 +1,4 @@
-const GoogleSheetsAPI = require('../../src/api/googleSheetsAPI');
+const GoogleSheetsAPI = require('../../src/api/GoogleSheetsAPI');
 
 var correctApi;
 

@@ -19,15 +19,20 @@ class GoogleSheetsAPI {
     }
 
     async getRows() {
-        const rows = await this.sheet.getRows();
-        return rows;
+        try{
+            const rows = await this.sheet.getRows();
+            return rows;
+        } catch (e) {
+            console.error(`Error trying to retrieve rows`, e.message);
+            return null;
+        }
     }
 
     async getRowByIndex(idx) {
         try {
             const rows = await this.getRows();
             const row = rows[idx];
-            if (row === undefined) {
+            if (!row) {
                 throw { message: 'Index out of bounds' };
             }
             return row;

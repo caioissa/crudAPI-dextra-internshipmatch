@@ -6,4 +6,4 @@ const toString = array => {
     }
 }
 
-module.exports = toString;
+module.exports = { toString };

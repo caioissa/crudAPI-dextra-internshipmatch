@@ -1,7 +1,7 @@
-const toArray = require('../../utils/array');
-const getUserFromEmail = require('../../utils/username');
-const getAgeFromBirthdate = require('../../utils/birthdate');
-const srcFromGDriveUrl = require('../../utils/photoUrl');
+const { toArray } = require('../../utils/array');
+const { getUserFromEmail,
+        getAgeFromBirthdate,
+        srcFromGDriveUrl } = require ('../../utils/user');
 
 const parser = (row, i) => ({
     id: i,
