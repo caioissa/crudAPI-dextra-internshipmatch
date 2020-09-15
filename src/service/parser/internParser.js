@@ -1,13 +1,14 @@
-const { toArray } = require('../../utils/array');
-const { getUserFromEmail } = require('../../utils/username');
-const { getAgeFromBirthdate } = require('../../utils/birthdate');
+const toArray = require('../../utils/array');
+const getUserFromEmail = require('../../utils/username');
+const getAgeFromBirthdate = require('../../utils/birthdate');
+const srcFromGDriveUrl = require('../../utils/photoUrl');
 
 const parser = (row, i) => ({
     id: i,
     name: row['Nome completo'],
     username: getUserFromEmail(row['Email Address']),
     nickname: row['Apelido'],
-    photo_url: row['Foto de perfil'],
+    photo_url: srcFromGDriveUrl(row['Foto de perfil']),
     knows: toArray(row['Tecnologias que tem experiência']),
     wants: toArray(row['Tecnologias que quer aprender']),
     choices: toArray(row['Escolhas']),
@@ -16,4 +17,4 @@ const parser = (row, i) => ({
     age: getAgeFromBirthdate(row['Data de Nascimento'])
 })
 
-module.exports = { parser };
+module.exports = parser;

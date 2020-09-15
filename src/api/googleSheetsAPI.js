@@ -6,11 +6,16 @@ class GoogleSheetsAPI {
     }
 
     static async build(sheetId) {
-        const doc = new GoogleSpreadsheet(sheetId);
-        await doc.useServiceAccountAuth(require('../../json/credentials.json'));
-        await doc.loadInfo();
-        const sheet = doc.sheetsByIndex[0];
-        return new GoogleSheetsAPI(sheet);
+        try {
+            const doc = new GoogleSpreadsheet(sheetId);
+            await doc.useServiceAccountAuth(require('../../json/credentials.json'));
+            await doc.loadInfo();
+            const sheet = doc.sheetsByIndex[0];
+            return new GoogleSheetsAPI(sheet);
+        } catch (e) {
+            console.error(`Error trying to create sheet with id ${sheetId}`, e.message);
+            return null;
+        }
     }
 
     async getRows() {
@@ -19,16 +24,36 @@ class GoogleSheetsAPI {
     }
 
     async getRowByIndex(idx) {
-        const rows = await this.getRows();
-        return rows[idx];
+        try {
+            const rows = await this.getRows();
+            const row = rows[idx];
+            if (row === undefined) {
+                throw { message: 'Index out of bounds' };
+            }
+            return row;
+        } catch(e) {
+            console.error(`Error trying to access row with idx ${idx}`, e.message);
+            return null;
+        }
     }
 
     async editColumnInRow(idx, column, content) {
         const row = await this.getRowByIndex(idx);
-        row[column] = content;
-        await row.save();
-        return row[column];
+        if (row === null) {
+            return null;
+        }
+        try {
+            if (!(column in row)) {
+                throw { message: 'Column not found' };
+            }
+            row[column] = content;
+            await row.save();
+            return row[column];
+        } catch (e) {
+            console.error(`Error trying to access column ${column}`, e.message);
+            return null;
+        }
     }
 }
 
-module.exports = { GoogleSheetsAPI };
+module.exports = GoogleSheetsAPI;

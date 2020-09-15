@@ -6,4 +6,4 @@ const getAgeFromBirthdate = birthdate => {
     return today.diff(bd, 'years');
 }
 
-module.exports = { getAgeFromBirthdate };
+module.exports = getAgeFromBirthdate;
