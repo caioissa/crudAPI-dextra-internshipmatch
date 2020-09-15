@@ -42,7 +42,7 @@ class GoogleSheetsAPI {
         }
     }
 
-    async editColumnInRow(idx, column, content) {
+    async editColumnInRowByIndex(idx, column, content) {
         const row = await this.getRowByIndex(idx);
         if (row === null) {
             return null;

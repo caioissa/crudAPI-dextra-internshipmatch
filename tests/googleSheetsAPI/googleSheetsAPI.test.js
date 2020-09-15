@@ -24,12 +24,12 @@ test('Should get an error trying to fetch row out of bounds', async () => {
 })
 
 test('Should get an error trying to edit row out of bounds', async () => {
-    const edit = await correctApi.editColumnInRow(300, 'Escolhas', 'a;b;c;d');
+    const edit = await correctApi.editColumnInRowByIndex(300, 'Escolhas', 'a;b;c;d');
     expect(edit).toBeNull();
 })
 
 test('Should get an error trying to edit unexisting column', async () => {
-    const edit = await correctApi.editColumnInRow(0, 'Coluna Estranha', 'a;b;c;d');
+    const edit = await correctApi.editColumnInRowByIndex(0, 'Coluna Estranha', 'a;b;c;d');
     expect(edit).toBeNull();
 })
 
@@ -38,9 +38,9 @@ test('Should correctly edit row', async () => {
     var row = await correctApi.getRowByIndex(0);
     const past_choices = row['Escolhas'];
     const new_choices = '1;2;3;4';
-    const choices = await correctApi.editColumnInRow(0, 'Escolhas', new_choices);
+    const choices = await correctApi.editColumnInRowByIndex(0, 'Escolhas', new_choices);
     expect(choices).toEqual(new_choices);
-    await correctApi.editColumnInRow(0, past_choices);
+    await correctApi.editColumnInRowByIndex(0, 'Escolhas', past_choices);
     row = await correctApi.getRowByIndex(0);
     expect(row['Escolhas']).toEqual(past_choices);
 })

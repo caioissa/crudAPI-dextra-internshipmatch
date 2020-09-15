@@ -40,7 +40,7 @@ class InternService {
             if (choices.length !== 4) {
                 throw { message: 'Choices must be 4 items long' };
             }
-            return toArray(await this.sheetsAPI.editColumnInRow(id, 'Escolhas', toString(choices)));
+            return toArray(await this.sheetsAPI.editColumnInRowByIndex(id, 'Escolhas', toString(choices)));
         } catch (e) {
             console.error(`Error trying to write choices`, e.message);
             return null;
