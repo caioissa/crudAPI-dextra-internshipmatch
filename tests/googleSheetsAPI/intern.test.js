@@ -1,15 +1,17 @@
-const InternService = require('../../src/service/InternService');
+const internParser = require('../../src/service/parser/internParser');
+const SheetsService = require('../../src/service/SheetsService');
 
 var internService;
 
 test('Should connect to googleSheets', async () => {
     jest.setTimeout(10000);
-    internService = await InternService.build();
+    internService = await SheetsService.build(
+        '1ZCh7lPkzcnT1vTewM3pnDXrZwock_Avm4atEgxCxnrY', internParser);
     expect(internService).not.toBeNull();
 })
 
-test('Should fetch all stags', async () => {
-    const interns = await internService.getInterns();
+test('Should fetch all interns', async () => {
+    const interns = await internService.getAll();
     expect(interns.length).toBeGreaterThan(0);
     const props = ['id', 'name', 'photo_url'];
     interns.forEach(intern => {
@@ -20,37 +22,33 @@ test('Should fetch all stags', async () => {
 })
 
 test('Should fetch first intern', async () => {
-    const intern = await internService.getInternById(0);
-    const props = ['id', 'name', 'username', 'nickname', 'photo_url',
+    const intern = await internService.getById(0);
+    const props = ['id', 'name', 'username', 'email', 'nickname', 'photo_url',
                         'knows', 'wants', 'languages', 'bio', 'age'];
     props.forEach(prop => {
         expect(intern).toHaveProperty(prop);
     });
 })
 
-test('Should write choices to first intern', async () => {
+test('Should write choices to intern by email', async () => {
     jest.setTimeout(10000);
-    var intern = (await internService.getInterns())[0];
+    var intern = await internService.getById(0);
+    const email = intern.email;
     const past_choices = intern.choices;
     const new_choices = ['1','2','3','4'];
-    const choices = await internService.writeInternChoices(0, new_choices);
+    const choices = await internService.writeChoicesByEmail(email, new_choices);
     expect(choices).toEqual(new_choices);
-    await internService.writeInternChoices(0, past_choices);
-    intern = (await internService.getInterns())[0];
+    await internService.writeChoicesByEmail(email, past_choices);
+    intern = await internService.getById(0);
     expect(intern.choices).toEqual(past_choices);
 })
 
 test('Should get an error trying to fetch an intern for a non existing row', async () => {
-    const intern = await internService.getInternById(300);
+    const intern = await internService.getById(300);
     expect(intern).toBeNull();
 })
 
-test('Should get an error trying to write to a non existing row', async () => {
-    const choices = await internService.writeInternChoices(300, ['1', '2', '3', '4']);
-    expect(choices).toBeNull();
-})
-
-test('Should get an error trying to write invalid choices', async () => {
-    const choices = await internService.writeInternChoices(0, ['1', '2']);
+test('Should get an error trying to write to a non existing row by email', async () => {
+    const choices = await internService.writeChoicesByEmail('dummy', ['1', '2', '3', '4']);
     expect(choices).toBeNull();
 })

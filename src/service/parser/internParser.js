@@ -3,10 +3,11 @@ const { getUserFromEmail,
         getAgeFromBirthdate,
         srcFromGDriveUrl } = require ('../../utils/user');
 
-const parser = (row, i) => ({
+const internParser = (row, i) => ({
     id: i,
     name: row['Nome completo'],
     username: getUserFromEmail(row['Email Address']),
+    email: row['Email Address'],
     nickname: row['Apelido'],
     photo_url: srcFromGDriveUrl(row['Foto de perfil']),
     knows: toArray(row['Tecnologias que tem experiência']),
@@ -17,4 +18,4 @@ const parser = (row, i) => ({
     age: getAgeFromBirthdate(row['Data de Nascimento'])
 })
 
-module.exports = parser;
+module.exports = internParser;
