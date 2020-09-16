@@ -28,6 +28,20 @@ class GoogleSheetsAPI {
         }
     }
 
+    async filterRows(filter) {
+        try{
+            const rows = await this.getRows();
+            const filteredRows = rows.filter(filter);
+            if (filteredRows.length === 0) {
+                throw { message: 'No row met the conditions' };
+            }
+            return filteredRows;
+        } catch (e) {
+            console.error(`Error trying to fetch row by filter`, e.message);
+            return null;
+        }
+    }
+
     async getRowByIndex(idx) {
         try {
             const rows = await this.getRows();
@@ -56,6 +70,24 @@ class GoogleSheetsAPI {
             return row[column];
         } catch (e) {
             console.error(`Error trying to access column ${column}`, e.message);
+            return null;
+        }
+    }
+
+    async editColumnInRowByFilter(column, content, filter) {
+        try{
+            const row = (await this.filterRows(filter))[0];
+            if (row === null) {
+                return null;
+            }
+            if (!(column in row)) {
+                throw { message: 'Column not found' };
+            }
+            row[column] = content;
+            await row.save();
+            return row[column];
+        } catch (e) {
+            console.error(`Error trying to edit column ${column}`, e.message);
             return null;
         }
     }
