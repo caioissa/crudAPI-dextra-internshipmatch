@@ -28,6 +28,10 @@ class GoogleAuthAPI {
                 idToken: token,
                 audient: this.client_id
             });
+            if (!ticket) {
+                throw { message: 'Error fetching ticket.'}
+            }
+
             const { email } = ticket.getPayload();
             
             if (!email) {
