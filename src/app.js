@@ -1,11 +1,16 @@
 const express = require('express')
 
 const app = express();
-const stagsRouter = require('./router/stags')
-const teamsRouter = require('./router/teams')
+const { internRouter, buildInternService } = require('./routers/interns')
+const { teamRouter, buildTeamService } = require('./routers/teams')
+
+const setup = async () => {
+    await buildInternService();
+    await buildTeamService();
+}
 
 app.use(express.json());
-app.use(stagsRouter);
-app.use(teamsRouter);
+app.use(internRouter);
+app.use(teamRouter);
 
-module.exports = app
+module.exports = { app, setup }

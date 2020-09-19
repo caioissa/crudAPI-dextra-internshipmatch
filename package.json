@@ -1,5 +1,8 @@
 {
   "name": "crudapi-dextra-internshipmatch",
+  "jest": {
+    "testPathIgnorePatterns": ["tests/googleAuthAPI", "tests/googleSheetsAPI"]
+  },
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
