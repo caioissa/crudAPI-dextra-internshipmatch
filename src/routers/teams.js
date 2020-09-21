@@ -4,9 +4,11 @@ const teamParser = require('../service/parser/teamParser');
 const SheetsService = require('../service/SheetsService');
 
 var teamService;
+var authApi;
 const teamRouter = express.Router();
 
-const buildTeamService = async () => {
+const buildTeamService = async (auth) => {
+    authApi = auth;
     teamService = await SheetsService.build(
         '1OhISMkqyP1sgs1adu-jh5go1PgcQerzQeTjbcyEhx3M', teamParser);
 }

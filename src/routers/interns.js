@@ -4,9 +4,11 @@ const internParser = require('../service/parser/internParser');
 const SheetsService = require('../service/SheetsService');
 
 var internService;
+var authApi;
 const internRouter = express.Router();
 
-const buildInternService = async () => {
+const buildInternService = async (auth) => {
+    authApi = auth;
     internService = await SheetsService.build(
         '1ZCh7lPkzcnT1vTewM3pnDXrZwock_Avm4atEgxCxnrY', internParser);
 }
