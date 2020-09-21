@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 const { OAuth2Client } = require('google-auth-library');
 
 const { checkIfDextraEmail } = require('../utils/user');
@@ -12,8 +10,7 @@ class GoogleAuthAPI {
 
     static async build() {
         try {
-            const auth = await fs.promises.readFile('json/auth.json');
-            const client_id = JSON.parse(auth).client_id;
+            const client_id = process.env.GOOGLE_CLIENT_ID;
             const client = new OAuth2Client(client_id);
             return (client !=null && client_id != null) ? new GoogleAuthAPI(client, client_id) : null;
         } catch (e) {

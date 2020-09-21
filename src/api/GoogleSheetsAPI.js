@@ -8,7 +8,10 @@ class GoogleSheetsAPI {
     static async build(sheetId) {
         try {
             const doc = new GoogleSpreadsheet(sheetId);
-            await doc.useServiceAccountAuth(require('../../json/credentials.json'));
+            await doc.useServiceAccountAuth({
+                client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+                private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/gm, '\n')
+            });
             await doc.loadInfo();
             const sheet = doc.sheetsByIndex[0];
             return new GoogleSheetsAPI(sheet);
