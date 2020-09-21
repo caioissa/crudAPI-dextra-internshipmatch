@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 
 const app = express();
 const { internRouter, buildInternService } = require('./routers/interns')
@@ -12,6 +13,8 @@ const setup = async () => {
     await buildInternService(authApi);
     await buildTeamService(authApi);
 }
+
+app.use(cors())
 
 app.use(async (req, res, next) => {
     const token = req.headers.authorization;
