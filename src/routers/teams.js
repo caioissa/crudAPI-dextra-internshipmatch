@@ -10,7 +10,7 @@ const teamRouter = express.Router();
 const buildTeamService = async (auth) => {
     authApi = auth;
     teamService = await SheetsService.build(
-        '1OhISMkqyP1sgs1adu-jh5go1PgcQerzQeTjbcyEhx3M', teamParser);
+        process.env.TEAMS_SHEET_ID, teamParser);
 }
 
 teamRouter.post('/teams/choices/:email', async(req, res) => {

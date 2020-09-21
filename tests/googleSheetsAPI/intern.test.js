@@ -6,7 +6,7 @@ var internService;
 test('Should connect to googleSheets', async () => {
     jest.setTimeout(10000);
     internService = await SheetsService.build(
-        '1ZCh7lPkzcnT1vTewM3pnDXrZwock_Avm4atEgxCxnrY', internParser);
+        process.env.INTERNS_SHEET_ID, internParser);
     expect(internService).not.toBeNull();
 })
 

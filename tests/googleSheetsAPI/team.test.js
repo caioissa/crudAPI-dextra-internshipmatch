@@ -6,7 +6,7 @@ var teamService;
 test('Should connect to googleSheets', async () => {
     jest.setTimeout(10000);
     teamService = await SheetsService.build(
-        '1OhISMkqyP1sgs1adu-jh5go1PgcQerzQeTjbcyEhx3M', teamParser);
+        process.env.TEAMS_SHEET_ID, teamParser);
     expect(teamService).not.toBeNull();
 })
 
