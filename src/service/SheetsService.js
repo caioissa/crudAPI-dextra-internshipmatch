@@ -1,4 +1,4 @@
-const GoogleSheetsAPI = require('../api/GoogleSheetsAPI');
+const GoogleSheetsAPI = require('./src/api/GoogleSheetsAPI');
 const { toString } = require('../utils/string');
 const { toArray } = require('../utils/array');
 
