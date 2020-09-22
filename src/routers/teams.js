@@ -13,13 +13,13 @@ const buildTeamService = async (auth) => {
         process.env.TEAMS_SHEET_ID, teamParser);
 }
 
-teamRouter.post('/teams/choices/:email', async(req, res) => {
+teamRouter.post('/teams/choices/', async(req, res) => {
     try {
         const choices = req.body.choices
         if (!choices) {
             return res.status(400).send()
         }
-        if(!(await teamService.writeChoicesByEmail(req.params.email, choices))){
+        if(!(await teamService.writeChoicesByEmail(res.locals.email, choices))){
             return res.status(404).send()
         }
         res.status(200).send({message: 'OK'})

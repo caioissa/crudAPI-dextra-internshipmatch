@@ -38,7 +38,7 @@ class GoogleAuthAPI {
                 throw { message: 'Unauthorized email account' };
             }
 
-            return ticket.getPayload();
+            return email;
         } catch (e) {
             console.error('Error trying to verify token', e.message);
             return null;

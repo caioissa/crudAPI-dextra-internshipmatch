@@ -22,10 +22,11 @@ app.use(async (req, res, next) => {
     if (!token) {
       return res.status(403).send({ error: 'No credentials sent!' });
     }
-    const auth = await authApi.verify(token.split(' ')[1]);
-    if (auth === null) {
+    const email = await authApi.verify(token.split(' ')[1]);
+    if (email === null) {
         return res.status(403).send({ error: 'Invalid token.' })
     }
+    res.locals.email = email;
     next();
   });
 app.use(express.json());
