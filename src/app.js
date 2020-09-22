@@ -1,10 +1,11 @@
-const express = require('express')
-const cors = require('cors')
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const { internRouter, buildInternService } = require('./routers/interns')
-const { teamRouter, buildTeamService } = require('./routers/teams')
-const GoogleAuthAPI = require('./api/GoogleAuthAPI')
+const { internRouter, buildInternService } = require('./routers/interns');
+const { teamRouter, buildTeamService } = require('./routers/teams');
+const { authRouter } = require('./routers/auth');
+const GoogleAuthAPI = require('./api/GoogleAuthAPI');
 
 var authApi;
 
@@ -30,6 +31,7 @@ app.use(async (req, res, next) => {
 app.use(express.json());
 app.use(internRouter);
 app.use(teamRouter);
+app.use(authRouter);
 
 
 
