@@ -3,16 +3,16 @@ const { OAuth2Client } = require('google-auth-library');
 const { checkIfDextraEmail } = require('../utils/user');
 
 class GoogleAuthAPI {
-    constructor(client, client_id) {
+    constructor(client, clientId) {
         this.client = client;
-        this.client_id = client_id;
+        this.clientId = clientId;
     }
 
     static async build() {
         try {
-            const client_id = process.env.GOOGLE_CLIENT_ID;
-            const client = new OAuth2Client(client_id);
-            return (client !=null && client_id != null) ? new GoogleAuthAPI(client, client_id) : null;
+            const clientId = process.env.GOOGLE_CLIENT_ID;
+            const client = new OAuth2Client(clientId);
+            return (client !=null && clientId != null) ? new GoogleAuthAPI(client, clientId) : null;
         } catch (e) {
             console.error('Error trying to connect to OAuth client', e.message);
             return null;
@@ -23,7 +23,7 @@ class GoogleAuthAPI {
         try{
             const ticket = await this.client.verifyIdToken({
                 idToken: token,
-                audient: this.client_id
+                audient: this.clientId
             });
             if (!ticket) {
                 throw { message: 'Error fetching ticket.'}
