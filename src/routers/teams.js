@@ -13,7 +13,7 @@ const buildTeamService = async (auth) => {
         process.env.TEAMS_SHEET_ID, teamParser);
 }
 
-teamRouter.post('/teams/choices/', async(req, res) => {
+teamRouter.post('/choices', async(req, res) => {
     try {
         const choices = req.body.choices
         if (!choices) {
@@ -29,7 +29,7 @@ teamRouter.post('/teams/choices/', async(req, res) => {
     }
 })
 
-teamRouter.get('/teams/choices', async(req, res) => {
+teamRouter.get('/choices', async(req, res) => {
     try {
         const teams = await teamService.getAll();
         res.status(200).send(teams)

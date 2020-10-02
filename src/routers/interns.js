@@ -13,7 +13,7 @@ const buildInternService = async (auth) => {
         process.env.INTERNS_SHEET_ID, internParser);
 }
 
-internRouter.get('/interns', async (req, res) => {
+internRouter.get('/', async (req, res) => {
     try {
         const interns = await internService.getAll();
         const response = interns.map(i => ({
@@ -27,7 +27,7 @@ internRouter.get('/interns', async (req, res) => {
     }
 })
 
-internRouter.get('/interns/:id', async (req, res) => {
+internRouter.get('/info/:id', async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         if (Number.isNaN(id)) {
