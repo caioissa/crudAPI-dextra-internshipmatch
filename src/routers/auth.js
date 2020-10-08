@@ -8,7 +8,7 @@ const buildAuth = (auth) => {
 }
 
 authRouter.post('/auth', (req, res) => {
-    res.status(200).send({message: 'Usuário Autenticado'})
+    res.status(200).send({name: res.locals.name})
 })
 
 module.exports = { authRouter, buildAuth }

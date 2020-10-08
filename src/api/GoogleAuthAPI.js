@@ -29,16 +29,26 @@ class GoogleAuthAPI {
                 throw { message: 'Error fetching ticket.'}
             }
 
-            const { email } = ticket.getPayload();
+            const { email, given_name } = ticket.getPayload();
             
+            //VERIFICA email nas planilhas
+            //var isIntern;
+            //if (ta na tabela de intern) isIntern = true;
+            //else if (ta na tabela de team) isIntern = false;
+
             if (!email) {
                 throw { message: 'Error verifying the token' };
             }
+            //CHECK if isIntern === undefined
             if (!checkIfDextraEmail(email)) {
                 throw { message: 'Unauthorized email account' };
             }
 
-            return email;
+            //Devolve isIntern Junto
+            return {
+                email: email,
+                name: given_name
+            };
         } catch (e) {
             console.error('Error trying to verify token', e.message);
             return null;
