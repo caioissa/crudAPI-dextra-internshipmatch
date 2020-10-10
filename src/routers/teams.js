@@ -1,16 +1,15 @@
 const express = require('express')
+const teamParser = require('../service/parser/teamParser')
+const SheetsService = require('../service/SheetsService')
 
-const teamParser = require('../service/parser/teamParser');
-const SheetsService = require('../service/SheetsService');
-
-var teamService;
-var authApi;
-const teamRouter = express.Router();
+var teamService
+var authApi
+const teamRouter = express.Router()
 
 const buildTeamService = async (auth) => {
     authApi = auth;
     teamService = await SheetsService.build(
-        process.env.TEAMS_SHEET_ID, teamParser);
+        process.env.TEAMS_SHEET_ID, teamParser)
 }
 
 teamRouter.post('/choices', async(req, res) => {
@@ -31,7 +30,7 @@ teamRouter.post('/choices', async(req, res) => {
 
 teamRouter.get('/choices', async(req, res) => {
     try {
-        const teams = await teamService.getAll();
+        const teams = await teamService.getAll()
         res.status(200).send(teams)
     } catch (e) {
         res.status(500).send(e)

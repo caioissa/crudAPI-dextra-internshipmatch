@@ -1,7 +1,5 @@
 const { toArray } = require('../../utils/array');
-const { getUserFromEmail,
-        getAgeFromBirthdate,
-        srcFromGDriveUrl } = require ('../../utils/user');
+const { getUserFromEmail, getAgeFromBirthdate, srcFromGDriveUrl } = require ('../../utils/user');
 
 const internParser = (row, i) => ({
     id: i,
