@@ -10,7 +10,6 @@ const teamParser = (row, i) => ({
     technologies: toArray(row['Tecnologias utilizadas pela equipe']),
     clients: toArray(row['Clientes da equipe']),
     languages: toArray(row['Idiomas requisitados pela equipe']),
-    choices: toArray(row['Escolhas']),
     bio: row['Descreva a equipe']
 })
 

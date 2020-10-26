@@ -1,39 +1,37 @@
-const express = require('express')
-const cors = require('cors')
+const express = require('express');
+const cors = require('cors');
 
-const app = express()
-const { usuarioRouter, buildInternService, buildTeamService } = require('./routers/usuario')
-const { authRouter } = require('./routers/auth')
-const GoogleAuthAPI = require('./api/GoogleAuthAPI')
+const app = express();
+const { router, buildInternService, buildTeamService } = require('./routers/router');
+const GoogleAuthAPI = require('./api/GoogleAuthAPI');
 
-var authApi;
+var authApi, internService, teamService;
 
 const setup = async () => {
-    authApi = await GoogleAuthAPI.build()
-    await buildInternService(authApi)
-    await buildTeamService(authApi)
+    authApi = await GoogleAuthAPI.build();
+    internService = await buildInternService();
+    teamService = await buildTeamService();
 }
 
-app.use(cors())
+app.use(cors());
 
 app.use(async (req, res, next) => {
-    const token = req.headers.authorization
+    const token = req.headers.authorization;
     if (!token) {
-        return res.status(403).send({ error: 'No credentials sent!' })
+        return res.status(403).send({ error: 'No credentials sent!' });
     }
     //recebe também isIntern
-    const { email, name, isIntern } = await authApi.verify(token.split(' ')[1])
+    const { email, name, isIntern } = await authApi.verify(token.split(' ')[1], internService, teamService);
     if (email === null) {
-        return res.status(403).send({ error: 'Invalid token.' })
+        return res.status(403).send({ error: 'Invalid token.' });
     }
-    res.locals.email = email
-    res.locals.name = name
+    res.locals.email = email;
+    res.locals.name = name;
     res.locals.isIntern = isIntern;
     next();
 });
 
-app.use(express.json())
-app.use(usuarioRouter)
-app.use(authRouter)
+app.use(express.json());
+app.use(router);
 
 module.exports = { app, setup }

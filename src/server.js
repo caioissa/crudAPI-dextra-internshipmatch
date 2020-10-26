@@ -1,6 +1,6 @@
-const { app, setup } = require('./app')
+const { app, setup } = require('./app');
 
-const port = process.env.PORT || 80
+const port = process.env.PORT || 80;
 
 app.listen(port, async () => {
   await setup();
