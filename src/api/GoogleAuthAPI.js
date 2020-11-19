@@ -1,6 +1,8 @@
 const { OAuth2Client } = require('google-auth-library');
 
 const { checkIfDextraEmail } = require('../utils/user');
+const Intern = require("../models/intern");
+const Team = require("../models/team");
 
 class GoogleAuthAPI {
     constructor(client, clientId) {
@@ -12,47 +14,47 @@ class GoogleAuthAPI {
         try {
             const clientId = process.env.GOOGLE_CLIENT_ID;
             const client = new OAuth2Client(clientId);
-            return (client !=null && clientId != null) ? new GoogleAuthAPI(client, clientId) : null;
+            return (client && clientId) ? new GoogleAuthAPI(client, clientId) : null;
         } catch (e) {
             console.error('Error trying to connect to OAuth client', e.message);
             return null;
         }
     }
 
-    async verify(token, internService, teamService) {
+    async verify(token) {
         try{
             const ticket = await this.client.verifyIdToken({
                 idToken: token,
                 audient: this.clientId
             });
             if (!ticket) {
-                throw { message: 'Error fetching ticket.'}
+                throw { message: 'Error fetching ticket.' }
             }
 
-            const { email, given_name } = ticket.getPayload();
+            const { email } = ticket.getPayload();
 
             if (!email) {
                 throw { message: 'Error verifying the token' };
             }
             
-            var isIntern;
-            if(await internService.sheetsAPI.filterRows(row => row['Email Address'] === email) != null){
-                isIntern = true;
-            }
+            const intern = await Intern.findOne({ email });
+            const team = await Team.findOne({ email });
 
-            if(await teamService.sheetsAPI.filterRows(row => row['Email Address'] === email) != null){
-                isIntern = false;
-            }
-
-            if (!checkIfDextraEmail(email) || isIntern === undefined) {
+            if (!checkIfDextraEmail(email) || !(intern || team)) {
                 throw { message: 'Unauthorized email account' };
             }
 
-            return {
-                email: email,
-                name: given_name,
-                isIntern: isIntern
-            };
+            if (intern) {
+                return {
+                    user: intern,
+                    isIntern: true
+                }
+            } else {
+                return {
+                    user: team,
+                    isIntern: false
+                }
+            }
         } catch (e) {
             console.error('Error trying to verify token', e.message);
             return null;

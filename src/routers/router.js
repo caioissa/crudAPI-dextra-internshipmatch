@@ -1,118 +1,136 @@
 const express = require('express');
-const teamParser = require('../service/parser/teamParser');
-const internParser = require('../service/parser/internParser');
-const SheetsService = require('../service/SheetsService');
+const mongoose = require("mongoose");
 
-var teamService, internService;
+const { Intern, Team } = require("../models");
+const { auth } = require("../middlewares/auth");
+
 const router = express.Router();
 
-const buildTeamService = async () => {
-    teamService = await SheetsService.build(
-        process.env.TEAMS_SHEET_ID, teamParser);
-    return teamService;
-}
-
-const buildInternService = async () => {
-    internService = await SheetsService.build(
-        process.env.INTERNS_SHEET_ID, internParser);
-    return internService;
-}
-
-router.post('/auth', (req, res) => {
-    res.status(200).send({name: res.locals.name});
+router.post('/auth', auth, (req, res) => {
+    res.status(200).send({ name: res.locals.user.name });
 })
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
+        var data;
         if (!res.locals.isIntern) {
-            const interns = await internService.getAll();
-            const response = interns.map(i => ({
-                id: i.id,
-                name: i.name,
-                photo_url: i.photo_url
-            }))
-            res.status(200).send(response)
+            data = await Intern.find();
         } else {
-            const teams = await teamService.getAll();
-            const response = teams.map(i => ({
-                id: i.id,
-                name: i.name,
-                photo_url: i.photo_url
-            }))
-            res.status(200).send(response)
+            data = await Team.find();
         }
-    } catch (e) {
-        res.status(500).send(e)
-    }
-})
 
-router.get('/info/:id', async (req, res) => {
-    try {
-        if (!res.locals.isIntern) {
-            const id = parseInt(req.params.id);
-            if (Number.isNaN(id)) {
-                return res.status(400).send()
-            }
-            const interns = await internService.getById(id);
-            if (!interns) {
-                return res.status(404).send()
-            }
-            res.status(200).send(interns)
-        } else {
-            const id = parseInt(req.params.id);
-            if (Number.isNaN(id)) {
-                return res.status(400).send()
-            }
-            const teams = await teamService.getById(id);
-            if (!teams) {
-                return res.status(404).send()
-            }
-            res.status(200).send(teams)
-        }
+        const response = data.map(i => ({
+            id: i._id,
+            name: i.name,
+            photo: i.photo
+        }));
+        res.status(200).send(response);
     } catch (e) {
-        res.status(500).send(e)
-    }
-})
-
-router.post('/choices', async (req, res) => {
-    try {
-        if (!res.locals.isIntern) {
-            const choices = req.body.choices;
-            if (!choices) {
-                return res.status(400).send();
-            }
-            if (!(await teamService.writeChoicesByEmail(res.locals.email, choices))) {
-                return res.status(404).send();
-            }
-            res.status(200).send({ message: 'OK' })
-        } else {
-            const choices = req.body.choices;
-            if (!choices) {
-                return res.status(400).send();
-            }
-            if (!(await internService.writeChoicesByEmail(res.locals.email, choices))) {
-                return res.status(404).send();
-            }
-            res.status(200).send({ message: 'OK' });
-        }
-    } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        console.error(e.message);
+        res.status(500).send();
     }
 });
 
-router.get('/choices', async (req, res) => {
+router.post("/", async (req, res) => {
     try {
-        if (!res.locals.isIntern) {
-            const teams = await teamService.getAll();
-            res.status(200).send(teams);
-        } else {
-            const teams = await internService.getAll();
-            res.status(200).send(teams);
+        const { isIntern, ...rest } = req.body;
+        rest.choices = [];
+        var user;
+        try{
+            if (isIntern) {
+                user = new Intern(rest);
+            } else {
+                user = new Team(rest);
+            }
+            await user.save();
+        } catch (e) {
+            res.status(400).send({ error: e.message });
         }
+        res.status(201).send(user);
     } catch (e) {
-        res.status(500).send(e);
+        console.error(e.message);
+        res.status(500).send();
     }
 });
 
-module.exports = { router, buildInternService, buildTeamService };
+router.get('/info/:id', auth, async (req, res) => {
+    try {
+        var data;
+        const id = mongoose.Types.ObjectId(req.params.id);
+        if (!res.locals.isIntern) {
+            data = await Intern.findById(id).select("-choices");
+        } else {
+            data = await Team.findById(id).select("-choices");
+        }
+
+        if (!data) {
+            return res.status(404).send();
+        }
+        res.status(200).send(data);
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send();
+    }
+});
+
+router.post('/choices', auth, async (req, res) => {
+    try {
+        const choices = req.body.choices;
+        if (!choices) {
+            return res.status(400).send({ error: "Please send the list of Choices" });
+        }
+        const user = res.locals.user;
+        try{
+            user.choices = choices.map(mongoose.Types.ObjectId);
+        } catch (e) {
+            return res.status(400).send({ error: "Please send a list of ObjectIds" });
+        }
+        await user.save();
+    
+        res.status(200).send({ message: 'OK' })
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send();
+    }
+});
+
+router.get("/match", async (req, res) => {
+    try {
+        const interns = await Intern.find()
+            .select("-photo")
+            .select("-knowsTechnologies")
+            .select("-learnTechnologies")
+            .select("-languages")
+            .select("-description")
+            .select("-birthDate")
+            .select("-nickname");
+        const teams = await Team.find()
+            .select("-photo")
+            .select("-technologies")
+            .select("-clients")
+            .select("-languages")
+            .select("-description");
+
+        res.status(200).send({ 
+            interns: interns, 
+            teams: teams
+        });
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send();
+    }
+});
+
+router.post("/clear", async (req, res) => {
+    try {
+        await Intern.deleteMany({});
+        await Team.deleteMany({});
+
+        res.status(201).send();
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send();
+    }
+});
+
+module.exports = router;
