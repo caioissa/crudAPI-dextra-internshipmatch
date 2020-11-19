@@ -1,0 +1,225 @@
+openapi: "3.0.0"
+info:
+  description: "API for registering and choosing intern and team options for dextra internship program. Consumed by our own frontend service."
+  version: "1.2.0"
+  title: "Dextra Internship Match"
+servers:
+  - url: http://localhost
+    description: "Local Development"
+  - url: https://crudapi-dextra-facamp.herokuapp.com
+    description: "Production"
+tags:
+- name: "Client"
+  description: "Consumed by the client application"
+- name: "Match"
+  description: "Consumed by match app"
+paths:
+  /:
+    get:
+      tags:
+      - "Client"
+      summary: "Get all available options"
+      description: "Fetchs all options for the authenticated user. It returns all interns if you are a team, and vice versa."
+      operationId: "getAll"
+      responses:
+        "200":
+          description: "Array of users"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        "403":
+          description: "Unauthenticated User"
+      security: 
+        - bearerAuth: []
+    post:
+      tags:
+      - "Client"
+      summary: "Create new user"
+      description: "Creates a new user and saves it to the Database."
+      operationId: "createUser"
+      requestBody:
+        description: "User data"
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/InfoIntern'
+                - $ref: '#/components/schemas/InfoTeam'
+      responses:
+        "400":
+          description: "Incomplete body or duplicate data"
+        "201":
+          description: "User created"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/InfoTeam'
+                  - $ref: '#/components/schemas/InfoIntern'
+  /info/{id}:
+    get:
+      tags:
+      - "Client"
+      summary: "Get info on user"
+      operationId: "getInfo"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "403":
+          description: "Unauthenticated User"
+        "404":
+          description: "Id not found"
+        "200":
+          description: "Team Info"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/InfoTeam'
+                  - $ref: '#/components/schemas/InfoIntern'
+      security: 
+      - bearerAuth: []
+  /choices:
+    post:
+      tags:
+      - "Client"
+      summary: "Makes choices"
+      description: "Chooses interns/teams for authenticated user"
+      operationId: "choices"
+      requestBody:
+        description: "Choices"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        "403":
+          description: "Unauthenticated User"
+        "200":
+          description: "Choices made"
+        "400":
+          description: "If no list of choices is sent"
+  /match:
+    get:
+      tags:
+      - "Match"
+      summary: "Get choices of all users"
+      operationId: "getMatch"
+      responses:
+        "200":
+          description: "Choices"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  interns:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InternChoices'
+                  teams:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TeamChoices'
+  /clear:
+    post:
+      tags:
+      - "Match"
+      summary: "Deletes all entries"
+      operationId: "clear"
+      responses:
+        "200":
+          description: "Cleared entries"
+      
+components:
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  
+      
+  schemas:
+    User:
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        photo:
+          type: string
+    Info:
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        photo:
+          type: string
+    InfoIntern:
+      allOf:
+        - $ref: '#/components/schemas/Info'
+        - type: object
+          properties:
+            nickname:
+              type: string
+            birthdate:
+              type: string
+            knowsTechnologies:
+              type: array
+              items:
+                type: string
+            wantsTechnologies:
+              type: array
+              items:
+                type: string
+    InfoTeam:
+      allOf:
+        - $ref: '#/components/schemas/Info'
+        - type: object
+          properties:
+            ammountOfSpots:
+              type: integer
+              default: 3
+            birthdate:
+              type: string
+            technologies:
+              type: array
+              items:
+                type: string
+            clients:
+              type: array
+              items:
+                type: string
+    Choices:
+      properties:
+        choices:
+          type: array
+          items:
+            type: string
+    InternChoices:
+      allOf:
+        - $ref: '#/components/schemas/InfoIntern'
+        - $ref: '#/components/schemas/Choices'
+    TeamChoices:
+      allOf:
+        - $ref: '#/components/schemas/InfoTeam'
+        - $ref: '#/components/schemas/Choices'

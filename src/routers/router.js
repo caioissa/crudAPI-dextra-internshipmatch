@@ -126,7 +126,7 @@ router.post("/clear", async (req, res) => {
         await Intern.deleteMany({});
         await Team.deleteMany({});
 
-        res.status(201).send();
+        res.status(200).send();
     } catch (e) {
         console.error(e.message);
         res.status(500).send();
