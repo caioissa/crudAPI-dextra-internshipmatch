@@ -1,15 +1,14 @@
 # CrudAPI Dextra InternshipMatch
-API para cadastro de equipes e estags
+API for registering and choosing intern and team options for dextra internship program. Consumed by our own frontend service.
+[Swagger](https://app.swaggerhub.com/apis-docs/caioissa/dextra-internship_match/1.2.0)
 ## Installation
 ```bash
 npm install
 ```
 ## Usage
 ```bash
-npm run dev
+npm start
 ```
-Open the [localhost:3000](http://localhost:3000) and try something!
-## Running tests
-```bash
-npm test
-```
+## Env Variables
+`GOOGLE_CLIENT_ID`
+`MONGODB_URL`
