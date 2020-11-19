@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require("mongoose");
 
-const Intern = require("../models/intern");
-const Team = require("../models/team");
+const { Intern, Team } = require("../models");
 const { auth } = require("../middlewares/auth");
 
 const router = express.Router();
@@ -35,13 +34,18 @@ router.get('/', auth, async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const { isIntern, ...rest } = req.body;
+        rest.choices = [];
         var user;
-        if (isIntern) {
-            user = new Intern(rest);
-        } else {
-            user = new Team(rest);
+        try{
+            if (isIntern) {
+                user = new Intern(rest);
+            } else {
+                user = new Team(rest);
+            }
+            await user.save();
+        } catch (e) {
+            res.status(400).send({ error: e.message });
         }
-        await user.save();
         res.status(201).send(user);
     } catch (e) {
         console.error(e.message);
@@ -84,6 +88,45 @@ router.post('/choices', auth, async (req, res) => {
         await user.save();
     
         res.status(200).send({ message: 'OK' })
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send();
+    }
+});
+
+router.get("/match", async (req, res) => {
+    try {
+        const interns = await Intern.find()
+            .select("-photo")
+            .select("-knowsTechnologies")
+            .select("-learnTechnologies")
+            .select("-languages")
+            .select("-description")
+            .select("-birthDate")
+            .select("-nickname");
+        const teams = await Team.find()
+            .select("-photo")
+            .select("-technologies")
+            .select("-clients")
+            .select("-languages")
+            .select("-description");
+
+        res.status(200).send({ 
+            interns: interns, 
+            teams: teams
+        });
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send();
+    }
+});
+
+router.post("/clear", async (req, res) => {
+    try {
+        await Intern.deleteMany({});
+        await Team.deleteMany({});
+
+        res.status(201).send();
     } catch (e) {
         console.error(e.message);
         res.status(500).send();
