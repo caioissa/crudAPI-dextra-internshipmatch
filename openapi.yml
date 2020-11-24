@@ -4,10 +4,10 @@ info:
   version: "1.2.0"
   title: "Dextra Internship Match"
 servers:
-  - url: http://localhost
-    description: "Local Development"
   - url: https://crudapi-dextra-facamp.herokuapp.com
     description: "Production"
+  - url: http://localhost
+    description: "Local Development"
 tags:
 - name: "Client"
   description: "Consumed by the client application"
