@@ -14,12 +14,34 @@ tags:
 - name: "Match"
   description: "Consumed by match app"
 paths:
+  /auth:
+    post:
+      tags: 
+      - "Client"
+      summary: "Check authentication"
+      description: "Fetches authenticated username"
+      operationId : "auth"
+      responses:
+        "200":
+          description: "User authenticated"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    default: "Caio Issa"
+        "403":
+          description: "Unauthenticated User"
+      security: 
+      - bearerAuth: []
   /:
     get:
       tags:
       - "Client"
       summary: "Get all available options"
-      description: "Fetchs all options for the authenticated user. It returns all interns if you are a team, and vice versa."
+      description: "Fetches all options for the authenticated user. It returns all interns if you are a team, and vice versa."
       operationId: "getAll"
       responses:
         "200":
@@ -47,8 +69,8 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/InfoIntern'
-                - $ref: '#/components/schemas/InfoTeam'
+                - $ref: '#/components/schemas/InfoInternCreate'
+                - $ref: '#/components/schemas/InfoTeamCreate'
       responses:
         "400":
           description: "Incomplete body or duplicate data"
@@ -83,8 +105,8 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/InfoTeam'
-                  - $ref: '#/components/schemas/InfoIntern'
+                  - $ref: '#/components/schemas/InfoTeamId'
+                  - $ref: '#/components/schemas/InfoInternId'
       security: 
       - bearerAuth: []
   /choices:
@@ -100,9 +122,12 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: string
+              type: object
+              properties:
+                choices:
+                  type: array
+                  items:
+                    type: string
       responses:
         "403":
           description: "Unauthenticated User"
@@ -110,6 +135,8 @@ paths:
           description: "Choices made"
         "400":
           description: "If no list of choices is sent"
+      security: 
+      - bearerAuth: []
   /match:
     get:
       tags:
@@ -160,8 +187,6 @@ components:
           type: string
     Info:
       properties:
-        _id:
-          type: string
         name:
           type: string
         email:
@@ -181,16 +206,20 @@ components:
           properties:
             nickname:
               type: string
-            birthdate:
+            birthDate:
               type: string
             knowsTechnologies:
               type: array
               items:
                 type: string
-            wantsTechnologies:
+            learnTechnologies:
               type: array
               items:
                 type: string
+    Id:
+      properties:
+        _id:
+          type: string
     InfoTeam:
       allOf:
         - $ref: '#/components/schemas/Info'
@@ -199,8 +228,6 @@ components:
             ammountOfSpots:
               type: integer
               default: 3
-            birthdate:
-              type: string
             technologies:
               type: array
               items:
@@ -209,6 +236,30 @@ components:
               type: array
               items:
                 type: string
+    InfoTeamCreate:
+      allOf:
+        - type: object
+          properties:
+            isIntern:
+              type: boolean
+              default: false
+        - $ref: '#/components/schemas/InfoTeam'
+    InfoInternCreate:
+      allOf:
+        - type: object
+          properties:
+            isIntern:
+              type: boolean
+              default: true
+        - $ref: '#/components/schemas/InfoIntern'
+    InfoTeamId:
+      allOf:
+        - $ref: '#/components/schemas/Id'
+        - $ref: '#/components/schemas/InfoTeam'
+    InfoInternId:
+      allOf:
+        - $ref: '#/components/schemas/Id'
+        - $ref: '#/components/schemas/InfoIntern'
     Choices:
       properties:
         choices:
@@ -217,9 +268,11 @@ components:
             type: string
     InternChoices:
       allOf:
+        - $ref: '#/components/schemas/Id'
         - $ref: '#/components/schemas/InfoIntern'
         - $ref: '#/components/schemas/Choices'
     TeamChoices:
       allOf:
+        - $ref: '#/components/schemas/Id'
         - $ref: '#/components/schemas/InfoTeam'
         - $ref: '#/components/schemas/Choices'
