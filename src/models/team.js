@@ -34,7 +34,7 @@ const teamSchema = new mongoose.Schema({
         trim: true
     }],
     photo: {
-        type: Buffer,
+        type: String,
         required: true
     },
     choices: [{

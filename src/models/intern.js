@@ -39,7 +39,7 @@ const internSchema = new mongoose.Schema({
         trim: true
     }],
     photo: {
-        type: Buffer,
+        type: String,
         required: true
     },
     choices: [{
